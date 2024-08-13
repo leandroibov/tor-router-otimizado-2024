@@ -1,0 +1,207 @@
+#!/bin/bash
+#INÍCIO SCRIPT TOR-ROUTER-----------------------------------------------------------------------------------------------#####################################
+echo;
+echo "Esse tor-router foi otimizado para rodar sem serviço e configurar de forma automatizada e rápida!";
+echo "Basta rodar o script!";
+echo "Créditos e a Versão original do tor-router: https://github.com/Edu4rdSHL/tor-router";
+echo;
+
+
+# Executable file to create rules for transparent proxy
+# Destinations you do not want routed through Tor
+NON_TOR="192.168.1.0/24 192.168.0.0/24"
+# the UID Tor runs as, actually only support for Debian, ArchLinux and Fedora as been added.
+if command -v pacman > /dev/null; then
+  TOR_UID=$(id -u tor)
+elif command -v apt > /dev/null; then
+  TOR_UID=$(id -u debian-tor)
+elif command -v dnf > /dev/null; then
+  TOR_UID=$(id -u toranon)
+else
+  echo "Unknown distro, please create report the issue to https://github.com/edu4rdshl/tor-router/issues"
+  exit
+fi
+
+# Tor's TransPort
+TRANS_PORT="9040"
+
+if ! command -v tor > /dev/null; then
+  echo "You need to install the tor package."
+  exit
+elif ! systemctl is-active tor.service > /dev/null; then
+  echo "The tor service is not active, please start the tor service before running the script. Trying now..."
+  #Certifique que o tor serviço está rodando;
+sudo echo "sudo systemctl enable tor.service;";
+sudo systemctl enable tor.service;
+sudo echo "";
+sudo echo "sudo systemctl restart tor.service;";
+sudo systemctl restart tor.service;
+sudo echo "";
+sudo echo "sudo systemctl is-active tor.service;";
+sudo systemctl is-active tor.service;
+echo "Run tor-router.sh or tor-router again..."
+sudo echo "";
+  exit
+elif ! command -v iptables > /dev/null; then
+  echo "You need to install the iptables package."
+  exit
+else
+
+# Define o caminho do arquivo torrc e o arquivo de backup
+TORRC="/etc/tor/torrc"
+BACKUP="${TORRC}.bak2"
+
+# Faz o backup do arquivo torrc
+cp -r "$TORRC" "$BACKUP"
+echo "Backup criado em $BACKUP"
+
+# Adiciona as linhas ao final do arquivo torrc
+{
+    echo "# Seting up TOR transparent proxy to route all system in tor network"
+    echo "VirtualAddrNetwork 10.192.0.0/10"
+    echo "AutomapHostsOnResolve 1"
+    echo "TransPort 9040"
+    echo "DNSPort 5353"
+} >> "$TORRC"
+
+echo "Linhas adicionadas ao arquivo $TORRC"
+echo;
+
+#DESABILITE A REDE PARA SEGURANÇA DA RECONFIGURAÇÃO - comando adicionado pois pode dar crash na rede com a mudança para alguns sistemas
+echo "Restartando network"
+echo "sudo service network-manager stop 
+sudo systemctl stop NetworkManager sudo nmcli networking off 
+e no mode disable"
+sudo service network-manager stop; 
+sudo service network-manager disable; 
+sudo systemctl stop NetworkManager;
+sudo systemctl disable NetworkManager;
+sudo nmcli networking off;
+sudo echo "";
+
+#Desabilitando o tráfego entre as placas - impede compartilhamento de conexão do pc para placa rj45 externa ou wifi de ponto de acesso
+#Precisa criar uma opção de script com sudo echo 1 > /proc/sys/net/ipv4/ip_forward; para permiter placa externa e ponto #de acesso funcionar.
+echo "Configurações seguras para o kernel...";
+sudo echo 0 > /proc/sys/net/ipv4/ip_forward;
+
+#Proteção contra ping, SYN Cookies, IP Spooﬁng e proteções do kernel
+sudo echo 1 > /proc/sys/net/ipv4/tcp_syncookies;
+
+# Syn Flood (DoS) # Port scanners
+sudo echo 1 > /proc/sys/net/ipv4/icmp_echo_ignore_broadcasts; 
+
+#Redirecionamento seguro de pacotes
+sudo echo 1 > $i/secure_redirects; 
+
+# Broadcast echo protection enabled.
+sudo echo 0 > /proc/sys/net/ipv4/conf/all/forwarding;
+
+# Log strange packets.
+sudo echo 1 >/proc/sys/net/ipv4/conf/all/log_martians;
+
+# Bad error message protection enabled..
+sudo echo 1 > /proc/sys/net/ipv4/icmp_ignore_bogus_error_responses; 
+
+# IP spoofing protection.
+sudo echo 1 > /proc/sys/net/ipv4/conf/all/rp_filter;
+
+# Disable ICMP redirect acceptance.
+sudo echo 0 > /proc/sys/net/ipv4/conf/all/accept_redirects;
+sudo echo 0 > /proc/sys/net/ipv4/conf/all/send_redirects;
+
+# Disable source routed packets.
+sudo echo 0 > /proc/sys/net/ipv4/conf/all/accept_source_route;
+
+#Sem tracert e ping
+sudo echo 1 > /proc/sys/net/ipv4/icmp_echo_ignore_all;
+
+#APAGA REGRAS, LIMPA IPTABLES - comando adicionado pois pode dar crash na rede com a mudança para alguns sistemas
+sudo iptables -P INPUT ACCEPT
+sudo iptables -P FORWARD ACCEPT
+sudo iptables -P OUTPUT ACCEPT
+sudo iptables -t nat -F
+sudo iptables -t mangle -F
+sudo iptables -F
+sudo iptables -X
+
+
+  iptables -t nat -A OUTPUT -m owner --uid-owner $TOR_UID -j RETURN
+  iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 5353
+
+  for NET in $NON_TOR 127.0.0.0/9 127.128.0.0/10; do
+    iptables -t nat -A OUTPUT -d $NET -j RETURN
+  done
+
+  iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports $TRANS_PORT
+  iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+  for NET in $NON_TOR 127.0.0.0/8; do
+    iptables -A OUTPUT -d $NET -j ACCEPT
+  done
+
+  iptables -A OUTPUT -m owner --uid-owner $TOR_UID -j ACCEPT
+  iptables -A OUTPUT -j ACCEPT
+  
+  #restartando tor service
+  echo "restartando tor service";
+sudo systemctl enable tor.service;
+sudo systemctl stop tor.service;
+sudo systemctl start tor.service;
+sudo systemctl status tor.service;
+  
+  #REATIVA NETWORK REDE
+sudo service network-manager stop; 
+sudo service network-manager start; 
+sudo service network-manager restart; 
+sudo systemctl stop NetworkManager;
+sudo systemctl disable NetworkManager;
+sudo systemctl enable NetworkManager;
+sudo systemctl start NetworkManager;
+sudo systemctl restart NetworkManager;
+sudo nmcli networking off;
+sudo nmcli networking on;
+  
+fi
+
+
+echo "";
+#Checando ip tor exit node públic roteado pelo serviço tor e ipv6
+sudo echo "#Checando ip tor exit node públic roteado pelo serviço tor e ipv6";
+sudo echo "";
+sudo dig +short txt ch whoami.cloudflare @1.0.0.1;
+sudo curl checkip.amazonaws.com;
+sudo echo "";
+
+#Checar se está vazando DNS por https://dnsleaktest.com
+sudo echo "#Cheque se está vazando DNS por https://dnsleaktest.com";
+#firefox https://dnsleaktest.com;
+sudo echo "";
+
+#Checar legitimidade do ip tor por https://check.torproject.org
+sudo echo "#Cheque legitimidade do ip tor por https://check.torproject.org";
+#firefox https://check.torproject.org;
+sudo echo "";
+
+#LISTA REGRAS FIREWALL
+sudo echo "";
+echo "############################ LISTA REGRAS IPTABLES ############################"
+sudo echo "";
+sudo echo "############################ Table Filter ############################";
+sudo iptables -t filter -S;
+sudo echo "";
+
+sudo echo "############################ Table Nat ############################";
+sudo iptables -t nat -S;
+sudo echo "";
+
+sudo echo "############################ Table Mangle ############################";
+sudo iptables -t mangle -S;
+sudo echo "";
+
+sudo echo "############################ Table Raw ############################";
+sudo iptables -t raw -S;
+sudo echo "############################ FIM LISTAR REGRAS IPTABLES ############################";
+sudo echo "";
+
+
+#FIM SCRIPT TOR-ROUTER-----------------------------------------------------------------------------------------------#####################################
