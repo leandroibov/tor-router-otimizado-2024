@@ -1,8 +1,11 @@
-4a69d72911edfd7dc330c176ca4989ee86adc831d6c9fa20299469f9eabc4f08  instala_tor.sh
+hashs sha256
 
-f5010bbe9587070e82cabe9a9db83fc7526cf0db622deeac2524ceccc9143061  parar-tor-router
+337d8cc3f12f42b86246a096cc57f5a3e4eb0cff39b5b1cee0b66db9420c9c2b  instala_tor.sh
 
-0a58fec9ad06235cf02775460b804ba59c453b734917cdca832c137010306f1d  tor-router
+339a67158ec2ab5e611bea9f1e2573d74208933aeaa5d70d929c7e15a2502848  parar-tor-router
+
+7fee3fb880853c70ea033324c361eebccae39e7b15bda2b00b47732486dc37e5  tor-router
+
 
 
 Esse tor-router foi otimizado para rodar sem serviço e configurar de forma automatizada e rápida!
