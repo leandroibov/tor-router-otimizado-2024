@@ -54,8 +54,11 @@ BACKUP="${TORRC}.bak2"
 # Faz o backup do arquivo torrc
 cp -r "$TORRC" "$BACKUP"
 echo "Backup criado em $BACKUP"
+echo "/etc/tor/torrc.bak2";
+echo;
 
 # Adiciona as linhas ao final do arquivo torrc
+echo "#Configuração tor-router" > "$TORRC";
 {
     echo "# Seting up TOR transparent proxy to route all system in tor network"
     echo "VirtualAddrNetwork 10.192.0.0/10"
