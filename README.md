@@ -2,7 +2,8 @@
 
 f5010bbe9587070e82cabe9a9db83fc7526cf0db622deeac2524ceccc9143061  parar-tor-router
 
-43d86f29fd669f6727507bd43cc9e9e172bd2d385b78dd290107c785e68d3cc3  tor-router
+0a58fec9ad06235cf02775460b804ba59c453b734917cdca832c137010306f1d  tor-router
+
 
 Esse tor-router foi otimizado para rodar sem serviço e configurar de forma automatizada e rápida!
 
