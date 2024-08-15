@@ -35,6 +35,15 @@ echo ""
 echo "sudo apt-get install tor deb.torproject.org-keyring python3-pip -y "
 sudo apt-get install tor deb.torproject.org-keyring 
 echo ""
+echo "_______________________________________________________________________________________________________________________________________________________________________________________";
+echo "ATENÇÃO: Fazendo backup de /etc/tor/* do arquivo torrc original para /home";
+echo "Caso os scripts tor-router, parar-tor-router, iniciator, parator não funcionarem, Coloque o arquivo original torrc na pasta /etc/tor para tentar reparar o funcionamento dos scripts";
+echo "_______________________________________________________________________________________________________________________________________________________________________________________";
+echo "sudo cp -r /etc/tor/* /home";
+sudo cp -r /etc/tor/* /home;
+echo "Faça mais backups desse arquivo!";
+
+
 #FIM INSTALAÇÃO TOR HIDDEN SERVICE ORIGINAL DO TOR PROJECT
 
 

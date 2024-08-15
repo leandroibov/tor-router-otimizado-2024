@@ -100,7 +100,7 @@ sudo echo 1 > $i/secure_redirects;
 sudo echo 0 > /proc/sys/net/ipv4/conf/all/forwarding;
 
 # Log strange packets.
-sudo echo 1 >/proc/sys/net/ipv4/conf/all/log_martians;
+sudo echo 1 > /proc/sys/net/ipv4/conf/all/log_martians;
 
 # Bad error message protection enabled..
 sudo echo 1 > /proc/sys/net/ipv4/icmp_ignore_bogus_error_responses; 
