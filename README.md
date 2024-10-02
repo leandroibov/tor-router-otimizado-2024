@@ -1,3 +1,4 @@
+# TOR ROUTER
 
 Esse tor-router foi otimizado para rodar sem serviço e configurar de forma automatizada e rápida!
 
@@ -11,9 +12,8 @@ sudo chmod +x instala_tor.sh;
 
 sudo ./instala_tor.sh;
 
-##################################################################################
 
-Rodar o tor-router otimizado de qualquer lugar do terminal.
+# Rodar o tor-router otimizado de qualquer lugar do terminal.
 
 sudo chmod +x tor-router parar-tor-router;
 
@@ -33,9 +33,8 @@ sudo ./parar-tor-router
 
 
 
-##################################################################################################
 
-Doe monero para nos ajudar: 
+# Doe monero para nos ajudar: 
 
 87JGuuwXzoMGwQAcSD7cvS7D7iacPpN2f5bVqETbUvCgdEmrPZa12gh5DSiKKRgdU7c5n5x1UvZLj8PQ7AAJSso5CQxgjak
 
